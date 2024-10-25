@@ -1,3 +1,4 @@
+import { SampleFile, TextFile } from "projen";
 import {
   NodePackageManager,
   TrailingComma,
@@ -42,5 +43,39 @@ const project = new TypeScriptProject({
 
 project.eslint?.addPlugins("unicorn");
 project.setScript("preinstall", "npx only-allow pnpm");
+
+new SampleFile(project, ".vitepress/config.ts", {
+  contents: [
+    'import { defineConfig } from "vitepress";',
+    "",
+    "export default defineConfig({",
+    "  //",
+    "});",
+    "",
+  ].join("\n"),
+});
+
+new TextFile(project, ".editorconfig", {
+  lines: [
+    "root = true",
+    "",
+    "[*]",
+    "indent_style = space",
+    "indent_size = 2",
+    "end_of_line = lf",
+    "charset = utf-8",
+    "trim_trailing_whitespace = true",
+    "insert_final_newline = true",
+    "",
+    "[*.md]",
+    "trim_trailing_whitespace = false",
+    "max_line_length = 120",
+    "",
+  ],
+});
+
+new TextFile(project, ".markdownlint.json", {
+  lines: ["{", '  "MD013": {', '    "line_length": 120', "  }", "}"],
+});
 
 project.synth();
