@@ -5,10 +5,9 @@ import {
   TypeScriptModuleResolution,
 } from "projen/lib/javascript";
 import { TypeScriptProject } from "projen/lib/typescript";
-
+const nodeVersion = "20";
 const commonIgnore = [".vscode/settings.json", "/.vitepress/dist"];
-
-const devDeps = ["eslint-plugin-unicorn"];
+const devDeps = ["eslint-plugin-unicorn", "tsx"];
 const deps = ["vitepress", "vue"];
 
 const project = new TypeScriptProject({
@@ -20,7 +19,10 @@ const project = new TypeScriptProject({
   devDeps: devDeps,
   release: false,
   github: false,
+  projenrcTs: true,
   prettier: true,
+  maxNodeVersion: nodeVersion,
+  minNodeVersion: nodeVersion,
   prettierOptions: {
     settings: {
       trailingComma: TrailingComma.ALL,
@@ -29,7 +31,7 @@ const project = new TypeScriptProject({
   jest: false,
   tsconfig: {
     compilerOptions: {
-      module: "ES2022",
+      module: "ES2020",
       moduleResolution: TypeScriptModuleResolution.NODE,
       lib: ["DOM", "ES2020"],
       noUncheckedIndexedAccess: true,
@@ -41,6 +43,9 @@ const project = new TypeScriptProject({
   gitignore: commonIgnore,
 });
 
+project.deps.removeDependency("ts-node");
+project.defaultTask?.reset();
+project.defaultTask?.exec("tsx .projenrc.ts");
 project.eslint?.addPlugins("unicorn");
 project.setScript("preinstall", "npx only-allow pnpm");
 
@@ -76,6 +81,10 @@ new TextFile(project, ".editorconfig", {
 
 new TextFile(project, ".markdownlint.json", {
   lines: ["{", '  "MD013": {', '    "line_length": 120', "  }", "}"],
+});
+
+new TextFile(project, ".nvmrc", {
+  lines: [nodeVersion],
 });
 
 project.synth();
