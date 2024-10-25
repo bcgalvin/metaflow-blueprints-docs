@@ -6,8 +6,13 @@ import {
 } from "projen/lib/javascript";
 import { TypeScriptProject } from "projen/lib/typescript";
 const nodeVersion = "20";
-const commonIgnore = [".vscode/settings.json", "/.vitepress/dist"];
-const devDeps = ["eslint-plugin-unicorn", "tsx"];
+const commonIgnore = [
+  ".vscode/settings.json",
+  ".vitepress/dist",
+  ".vitepress/cache",
+  ".vitepress/.temp",
+];
+const developmentDeps = ["eslint-plugin-unicorn", "tsx"];
 const deps = ["vitepress", "vue"];
 
 const project = new TypeScriptProject({
@@ -16,7 +21,7 @@ const project = new TypeScriptProject({
   defaultReleaseBranch: "main",
   packageManager: NodePackageManager.PNPM,
   deps: deps,
-  devDeps: devDeps,
+  devDeps: developmentDeps,
   release: false,
   github: false,
   projenrcTs: true,
@@ -47,6 +52,7 @@ project.deps.removeDependency("ts-node");
 project.defaultTask?.reset();
 project.defaultTask?.exec("tsx .projenrc.ts");
 project.eslint?.addPlugins("unicorn");
+project.eslint?.addExtends("plugin:unicorn/recommended");
 project.setScript("preinstall", "npx only-allow pnpm");
 
 new SampleFile(project, ".vitepress/config.ts", {
@@ -86,5 +92,27 @@ new TextFile(project, ".markdownlint.json", {
 new TextFile(project, ".nvmrc", {
   lines: [nodeVersion],
 });
+
+project.addTask("docs:dev", { exec: "DEBUG=vitepress* vitepress dev" });
+project.addTask("docs:build", {
+  exec: "DEBUG=vitepress* vitepress build",
+});
+project.addTask("docs:serve", { exec: "DEBUG=vitepress* vitepress serve" });
+new SampleFile(project, "docs/.vitepress/config.ts", {
+  contents: [
+    'import { defineConfig } from "vitepress";',
+    "",
+    "export default defineConfig({",
+    "  //",
+    "});",
+    "",
+  ].join("\n"),
+});
+
+project.compileTask.reset();
+project.compileTask.exec("vitepress build");
+project.packageTask.reset();
+
+project.package.file.addOverride("type", "module");
 
 project.synth();

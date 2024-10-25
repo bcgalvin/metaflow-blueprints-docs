@@ -30,7 +30,9 @@ jspm_packages/
 .yarn-integrity
 .cache
 .vscode/settings.json
-/.vitepress/dist
+.vitepress/dist
+.vitepress/cache
+.vitepress/.temp
 !/.prettierignore
 !/.prettierrc.json
 !/.npmrc

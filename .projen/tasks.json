@@ -61,7 +61,7 @@
       "description": "Only compile",
       "steps": [
         {
-          "exec": "tsc --build"
+          "exec": "vitepress build"
         }
       ]
     },
@@ -71,6 +71,30 @@
       "steps": [
         {
           "exec": "tsx .projenrc.ts"
+        }
+      ]
+    },
+    "docs:build": {
+      "name": "docs:build",
+      "steps": [
+        {
+          "exec": "DEBUG=vitepress* vitepress build"
+        }
+      ]
+    },
+    "docs:dev": {
+      "name": "docs:dev",
+      "steps": [
+        {
+          "exec": "DEBUG=vitepress* vitepress dev"
+        }
+      ]
+    },
+    "docs:serve": {
+      "name": "docs:serve",
+      "steps": [
+        {
+          "exec": "DEBUG=vitepress* vitepress serve"
         }
       ]
     },
@@ -116,15 +140,7 @@
     },
     "package": {
       "name": "package",
-      "description": "Creates the distribution package",
-      "steps": [
-        {
-          "exec": "mkdir -p dist/js"
-        },
-        {
-          "exec": "pnpm pack --pack-destination dist/js"
-        }
-      ]
+      "description": "Creates the distribution package"
     },
     "post-compile": {
       "name": "post-compile",
