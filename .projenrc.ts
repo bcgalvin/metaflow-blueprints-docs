@@ -1,12 +1,46 @@
-import { typescript } from 'projen';
-const project = new typescript.TypeScriptProject({
-  defaultReleaseBranch: 'main',
-  name: 'metaflow-blueprints-docs',
-  projenrcTs: true,
+import {
+  NodePackageManager,
+  TrailingComma,
+  TypeScriptModuleResolution,
+} from "projen/lib/javascript";
+import { TypeScriptProject } from "projen/lib/typescript";
 
-  // deps: [],                /* Runtime dependencies of this module. */
-  // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
-  // devDeps: [],             /* Build dependencies for this module. */
-  // packageName: undefined,  /* The "name" in package.json. */
+const commonIgnore = [".vscode/settings.json", "/.vitepress/dist"];
+
+const devDeps = ["eslint-plugin-unicorn"];
+const deps = ["vitepress", "vue"];
+
+const project = new TypeScriptProject({
+  name: "metaflow-blueprints-docs",
+  description: "Documentation for Metaflow Blueprints",
+  defaultReleaseBranch: "main",
+  packageManager: NodePackageManager.PNPM,
+  deps: deps,
+  devDeps: devDeps,
+  release: false,
+  github: false,
+  prettier: true,
+  prettierOptions: {
+    settings: {
+      trailingComma: TrailingComma.ALL,
+    },
+  },
+  jest: false,
+  tsconfig: {
+    compilerOptions: {
+      module: "ES2022",
+      moduleResolution: TypeScriptModuleResolution.NODE,
+      lib: ["DOM", "ES2020"],
+      noUncheckedIndexedAccess: true,
+      noUnusedLocals: false,
+      noUnusedParameters: false,
+      target: "ES2020",
+    },
+  },
+  gitignore: commonIgnore,
 });
+
+project.eslint?.addPlugins("unicorn");
+project.setScript("preinstall", "npx only-allow pnpm");
+
 project.synth();
