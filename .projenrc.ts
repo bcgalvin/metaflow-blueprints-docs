@@ -1,4 +1,4 @@
-import { SampleFile, TextFile } from "projen";
+import { TextFile } from "projen";
 import {
   NodePackageManager,
   TrailingComma,
@@ -54,17 +54,16 @@ project.defaultTask?.exec("tsx .projenrc.ts");
 project.eslint?.addPlugins("unicorn");
 project.eslint?.addExtends("plugin:unicorn/recommended");
 project.setScript("preinstall", "npx only-allow pnpm");
+project.compileTask.reset();
+project.compileTask.exec("vitepress build");
+project.packageTask.reset();
+project.package.file.addOverride("type", "module");
 
-new SampleFile(project, ".vitepress/config.ts", {
-  contents: [
-    'import { defineConfig } from "vitepress";',
-    "",
-    "export default defineConfig({",
-    "  //",
-    "});",
-    "",
-  ].join("\n"),
+project.addTask("docs:dev", { exec: "DEBUG=vitepress* vitepress dev" });
+project.addTask("docs:build", {
+  exec: "DEBUG=vitepress* vitepress build",
 });
+project.addTask("docs:serve", { exec: "DEBUG=vitepress* vitepress serve" });
 
 new TextFile(project, ".editorconfig", {
   lines: [
@@ -86,33 +85,11 @@ new TextFile(project, ".editorconfig", {
 });
 
 new TextFile(project, ".markdownlint.json", {
-  lines: ["{", '  "MD013": {', '    "line_length": 120', "  }", "}"],
+  lines: ["{", '  "MD013": {', '    "line_length": 160', "  }", "}"],
 });
 
 new TextFile(project, ".nvmrc", {
   lines: [nodeVersion],
 });
-
-project.addTask("docs:dev", { exec: "DEBUG=vitepress* vitepress dev" });
-project.addTask("docs:build", {
-  exec: "DEBUG=vitepress* vitepress build",
-});
-project.addTask("docs:serve", { exec: "DEBUG=vitepress* vitepress serve" });
-new SampleFile(project, "docs/.vitepress/config.ts", {
-  contents: [
-    'import { defineConfig } from "vitepress";',
-    "",
-    "export default defineConfig({",
-    "  //",
-    "});",
-    "",
-  ].join("\n"),
-});
-
-project.compileTask.reset();
-project.compileTask.exec("vitepress build");
-project.packageTask.reset();
-
-project.package.file.addOverride("type", "module");
 
 project.synth();
