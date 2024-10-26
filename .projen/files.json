@@ -3,6 +3,7 @@
     ".editorconfig",
     ".eslintrc.json",
     ".gitattributes",
+    ".github/workflows/deploy-pages.yml",
     ".gitignore",
     ".markdownlint.json",
     ".npmignore",

@@ -1,4 +1,5 @@
 import { TextFile } from "projen";
+import { workflows } from "projen/lib/github";
 import {
   NodePackageManager,
   TrailingComma,
@@ -23,11 +24,18 @@ const project = new TypeScriptProject({
   deps: deps,
   devDeps: developmentDeps,
   release: false,
-  github: false,
+  github: true,
   projenrcTs: true,
   prettier: true,
   maxNodeVersion: nodeVersion,
+  depsUpgrade: false,
   minNodeVersion: nodeVersion,
+  buildWorkflow: false,
+  pullRequestTemplate: false,
+  githubOptions: {
+    pullRequestLint: false,
+    mergify: false,
+  },
   prettierOptions: {
     settings: {
       trailingComma: TrailingComma.ALL,
@@ -91,5 +99,86 @@ new TextFile(project, ".markdownlint.json", {
 new TextFile(project, ".nvmrc", {
   lines: [nodeVersion],
 });
+// Create the workflow with all configuration upfront
+const deployWorkflow = project.github?.addWorkflow("deploy-pages");
 
-project.synth();
+deployWorkflow?.on({
+  push: {
+    branches: ["main"],
+  },
+  workflowDispatch: {},
+});
+
+deployWorkflow?.addJob("build", {
+  name: "Build",
+  runsOn: ["ubuntu-latest"],
+  permissions: {
+    actions: workflows.JobPermission.WRITE,
+    pages: workflows.JobPermission.WRITE,
+    idToken: workflows.JobPermission.WRITE,
+  },
+  steps: [
+    {
+      uses: "actions/checkout@v4",
+    },
+    {
+      uses: "actions/setup-node@v4",
+      with: {
+        "node-version": nodeVersion,
+      },
+    },
+    {
+      uses: "pnpm/action-setup@v2",
+      with: {
+        version: "latest",
+      },
+    },
+    {
+      run: "pnpm install",
+    },
+    {
+      run: "pnpm docs:build",
+    },
+    {
+      uses: "actions/configure-pages@v4",
+    },
+    {
+      uses: "actions/upload-pages-artifact@v3",
+      with: {
+        path: ".vitepress/dist",
+      },
+    },
+  ],
+  concurrency: {
+    group: "pages",
+    "cancel-in-progress": false,
+  },
+});
+
+// Add deploy job
+deployWorkflow?.addJob("deploy", {
+  name: "Deploy",
+  needs: ["build"],
+  runsOn: ["ubuntu-latest"],
+  permissions: {
+    actions: workflows.JobPermission.WRITE,
+    pages: workflows.JobPermission.WRITE,
+    idToken: workflows.JobPermission.WRITE,
+  },
+  environment: {
+    name: "github-pages",
+    url: "${{ steps.deployment.outputs.page_url }}",
+  },
+  steps: [
+    {
+      uses: "actions/deploy-pages@v4",
+      id: "deployment",
+    },
+  ],
+  concurrency: {
+    group: "pages",
+    "cancel-in-progress": false,
+  },
+});
+
+const build = project.github?.project.synth();

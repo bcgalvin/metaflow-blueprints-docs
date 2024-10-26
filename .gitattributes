@@ -4,6 +4,7 @@
 /.editorconfig linguist-generated
 /.eslintrc.json linguist-generated
 /.gitattributes linguist-generated
+/.github/workflows/deploy-pages.yml linguist-generated
 /.gitignore linguist-generated
 /.markdownlint.json linguist-generated
 /.npmignore linguist-generated
