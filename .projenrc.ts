@@ -85,7 +85,7 @@ new TextFile(project, ".editorconfig", {
 });
 
 new TextFile(project, ".markdownlint.json", {
-  lines: ["{", '  "MD013": {', '    "line_length": 160', "  }", "}"],
+  lines: ["{", '  "MD013": {', '    "line_length": 200', "  }", "}"],
 });
 
 new TextFile(project, ".nvmrc", {

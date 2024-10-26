@@ -20,7 +20,7 @@ export default defineConfig({
       "link",
       {
         rel: "icon",
-        href: "/public/logo.svg",
+        href: "/logo.svg",
       },
     ],
   ],
@@ -37,7 +37,7 @@ export default defineConfig({
         "https://github.com/bcgalvin/metaflow-blueprints-docs/edit/main/src/:path",
       text: "Edit this page on GitHub",
     },
-    logo: { src: "/assets/logo.svg" },
+    logo: { src: "/logo.svg" },
     nav: [{ text: "Guide", link: "/", activeMatch: "^/$|^/guide/" }],
   },
 });
