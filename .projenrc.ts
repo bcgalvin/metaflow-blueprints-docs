@@ -113,7 +113,7 @@ deployWorkflow?.addJob("build", {
   name: "Build",
   runsOn: ["ubuntu-latest"],
   permissions: {
-    actions: workflows.JobPermission.WRITE,
+    contents: workflows.JobPermission.READ,
     pages: workflows.JobPermission.WRITE,
     idToken: workflows.JobPermission.WRITE,
   },
@@ -161,7 +161,7 @@ deployWorkflow?.addJob("deploy", {
   needs: ["build"],
   runsOn: ["ubuntu-latest"],
   permissions: {
-    actions: workflows.JobPermission.WRITE,
+    contents: workflows.JobPermission.READ,
     pages: workflows.JobPermission.WRITE,
     idToken: workflows.JobPermission.WRITE,
   },

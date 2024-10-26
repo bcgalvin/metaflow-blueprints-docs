@@ -2,9 +2,10 @@ import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vitepress";
 
 export default defineConfig({
-  srcDir: "src",
   title: "Metaflow Blueprints",
   description: "Documentation for Metaflow Blueprints",
+  base: "/metaflow-blueprints-docs/",
+  srcDir: "src",
   lastUpdated: true,
 
   vite: {
